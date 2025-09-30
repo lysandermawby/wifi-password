@@ -1,6 +1,9 @@
 
 # wifi-password
 
+> **NOTE:** This is a fork of [rauchg/wifi-password](https://github.com/rauchg/wifi-password/).
+> This changes the determination of the wifi [SSID](https://en.wikipedia.org/wiki/Service_set_(802.11_network)) from the depreciated ```airport``` utility to the ```system_profiler```.
+
 People ask you for the Wi-Fi password. Answer quickly. **macOS only**.
 [Windows version](https://github.com/RReverser/WiFi-Password).
 
