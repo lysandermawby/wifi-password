@@ -58,7 +58,12 @@ if [ "" != "$args" ]; then
   ssid="$@"
 else
   # get current ssid
-  ssid="`$airport -I | awk '/ SSID/ {print substr($0, index($0, $2))}'`"
+  # Try airport first (if it works), fallback to system_profiler
+  ssid="`$airport -I 2>/dev/null | awk '/ SSID/ {print substr($0, index($0, $2))}'`"
+  if [ "$ssid" = "" ]; then
+    # Fallback to system_profiler for newer macOS versions where airport is deprecated
+    ssid="`system_profiler SPAirPortDataType 2>/dev/null | awk -F': ' '/Current Network Information:/{getline; if ($1 ~ /^[ ]+[^ ]+/) {gsub(/^[ ]+|:$/, "", $1); print $1; exit}}'`"
+  fi
   if [ "$ssid" = "" ]; then
     echo "ERROR: Could not retrieve current SSID. Are you connected?" >&2
     exit 1
