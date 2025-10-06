@@ -57,14 +57,18 @@ args="$@"
 if [ "" != "$args" ]; then
   ssid="$@"
 else
-  # get current ssid
-  ssid="`$airport -I | awk '/ SSID/ {print substr($0, index($0, $2))}'`"
+  # get current ssid with fallback for newer macOS
+  # try airport (works on older macOS, returns empty on newer)
+  ssid="`$airport -I 2>/dev/null | awk '/ SSID/ {print substr($0, index($0, $2))}'`"
+  # if airport returned nothing, fall back to system_profiler
+  if [ "$ssid" = "" ]; then
+    ssid="`system_profiler SPAirPortDataType 2>/dev/null | awk -F': ' '/Current Network Information:/{getline; if ($1 ~ /^[ ]+[^ ]+/) {gsub(/^[ ]+|:$/, "", $1); print $1; exit}}'`"
+  fi
   if [ "$ssid" = "" ]; then
     echo "ERROR: Could not retrieve current SSID. Are you connected?" >&2
     exit 1
   fi
 fi
-
 # warn user about keychain dialog
 if [ $verbose ]; then
   echo ""
